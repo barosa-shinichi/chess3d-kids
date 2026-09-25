@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>3Dちぇす</title>
+<style>
+  :root {
+    --bg1: #bfe6ff; --bg2: #fff3d6;
+    --ink: #3b2f2a; --card: #fffaf0;
+    --btn: #ff9f43; --btn2: #54a0ff; --btn3: #1dd1a1; --btn4: #a29bfe;
+    --shadow: 0 4px 0 rgba(0,0,0,.18);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden; background: linear-gradient(var(--bg1), var(--bg2));
+    font-family: "Hiragino Maru Gothic ProN", "M PLUS Rounded 1c", "Rounded Mplus 1c", "Noto Sans JP", sans-serif;
+    color: var(--ink); user-select: none; -webkit-user-select: none; touch-action: none;
+  }
+  #view { position: fixed; inset: 0; }
+  #view canvas { display: block; touch-action: none; }
+
+  #top {
+    position: fixed; left: 0; right: 0; top: 0; padding: calc(env(safe-area-inset-top) + 10px) 12px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none;
+  }
+  #turn {
+    display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 999px;
+    padding: 8px 18px; font-size: 22px; font-weight: bold; box-shadow: var(--shadow);
+  }
+  #turnDot { width: 26px; height: 26px; border-radius: 50%; border: 3px solid #3b2f2a; }
+  #msg {
+    background: rgba(255,250,240,.93); border-radius: 16px; padding: 8px 16px; font-size: 18px;
+    line-height: 1.5; max-width: 560px; text-align: center; box-shadow: var(--shadow); min-height: 1em;
+    transition: opacity .3s;
+  }
+  #msg.empty { opacity: 0; }
+  #msg.warn { background: #ffe0e0; color: #b3001b; font-weight: bold; }
+
+  #bottom {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    padding: 0 10px calc(env(safe-area-inset-bottom) + 12px);
+    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+  }
+  button {
+    font: inherit; font-weight: bold; border: none; border-radius: 18px; color: white;
+    background: var(--btn); box-shadow: var(--shadow); cursor: pointer; padding: 10px 16px; font-size: 18px;
+  }
+  button:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
+  button:disabled { opacity: .45; }
+  .b-blue { background: var(--btn2); }
+  .b-green { background: var(--btn3); }
+  .b-purple { background: var(--btn4); }
+  .b-gray { background: #8395a7; }
+  .icon { display: block; font-size: 24px; line-height: 1.1; }
+  #bottom button { min-width: 74px; padding: 6px 10px 8px; font-size: 15px; }
+
+  .overlay {
+    position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(40, 60, 90, .45); padding: 16px; z-index: 10;
+  }
+  .overlay.show { display: flex; }
+  .card {
+    background: var(--card); border-radius: 28px; padding: 22px 20px; width: min(440px, 100%);
+    max-height: 92vh; overflow-y: auto; text-align: center; box-shadow: 0 8px 0 rgba(0,0,0,.2);
+    touch-action: pan-y;
+  }
+  .card h1 { margin: 4px 0 6px; font-size: 40px; letter-spacing: 2px; }
+  .card h2 { margin: 4px 0 14px; font-size: 26px; }
+  .card p { font-size: 18px; line-height: 1.6; margin: 6px 0 14px; }
+  .col { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .col button { font-size: 22px; padding: 14px; }
+  .row button { flex: 1; min-width: 100px; font-size: 20px; padding: 12px 8px; }
+  .sel { outline: 5px solid #3b2f2a; }
+  .small { font-size: 15px !important; opacity: .8; }
+  .label { font-size: 17px; margin: 14px 0 8px; font-weight: bold; }
+  .emoji { font-size: 54px; line-height: 1; }
+
+  .howto { text-align: left; }
+  .howto .pc { display: flex; gap: 12px; align-items: center; padding: 10px 4px; border-bottom: 2px dashed #eadfca; }
+  .howto .pc b { font-size: 20px; }
+  .howto .pc span { font-size: 16px; line-height: 1.5; }
+  .howto .sym { font-size: 40px; width: 50px; text-align: center; flex: none; }
+
+  #thinking {
+    position: fixed; right: 14px; top: calc(env(safe-area-inset-top) + 64px); font-size: 34px; display: none;
+    animation: bob 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 11; }
+</style>
+</head>
+<body>
+<div id="view"></div>
+
+<div id="top">
+  <div id="turn"><span id="turnDot"></span><span id="turnText">しろの ばん</span></div>
+  <div id="msg" class="empty">&nbsp;</div>
+</div>
+<div id="thinking">🤖</div>
+
+<div id="bottom">
+  <button id="bUndo" class="b-blue"><span class="icon">↩️</span>まった</button>
+  <button id="bHint" class="b-green"><span class="icon">💡</span>ひんと</button>
+  <button id="bTurn" class="b-purple"><span class="icon">🔄</span>まわす</button>
+  <button id="bMenu" class="b-gray"><span class="icon">🏠</span>めにゅー</button>
+</div>
+
+<!-- はじめの がめん -->
+<div id="ovStart" class="overlay show">
+  <div class="card">
+    <div class="emoji">♞</div>
+    <h1>3Dちぇす</h1>
+    <p class="small">こまを さわって うごかそう！</p>
+    <div class="col">
+      <button id="bTwo">👫 ふたりで あそぶ</button>
+      <button id="bRobot" class="b-blue">🤖 ろぼっとと あそぶ</button>
+      <button id="bHow" class="b-green">📖 こまの うごきかた</button>
+      <button id="bResume" class="b-gray" style="display:none">▶️ つづきから</button>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button id="bSound" class="b-purple small">🔊 おと: あり</button>
+    </div>
+  </div>
+</div>
+
+<!-- ろぼっと の せってい -->
+<div id="ovRobot" class="overlay">
+  <div class="card">
+    <div class="emoji">🤖</div>
+    <h2>ろぼっとと あそぶ</h2>
+    <div class="label">ろぼっとの つよさ</div>
+    <div class="row" id="levelRow">
+      <button data-level="1" class="b-green">やさしい</button>
+      <button data-level="2" class="b-blue sel">ふつう</button>
+      <button data-level="3">つよい</button>
+    </div>
+    <div class="label">あなたの いろ</div>
+    <div class="row" id="colorRow">
+      <button data-color="w" class="sel" style="background:#f5ebd9;color:#3b2f2a">しろ<br><span class="small">さきに うごく</span></button>
+      <button data-color="b" style="background:#3d3d4e">くろ<br><span class="small">あとで うごく</span></button>
+    </div>
+    <div class="col" style="margin-top:18px">
+      <button id="bRobotGo">はじめる！</button>
+      <button id="bRobotBack" class="b-gray">もどる</button>
+    </div>
+  </div>
+</div>
+
+<!-- うごきかた -->
+<div id="ovHow" class="overlay">
+  <div class="card">
+    <h2>📖 こまの うごきかた</h2>
+    <div class="howto" id="howList"></div>
+    <p class="small" style="text-align:left">
+      ⭐ あいての <b>おうさま</b>を つかまえたら かち！<br>
+      ⭐ こまを さわると、うごける ところが <span style="color:#10ac84">みどり</span>に ひかるよ。<br>
+      ⭐ ゆびで がめんを なぞると、ばんを まわせるよ。ふたつの ゆびで おおきく・ちいさく できるよ。
+    </p>
+    <div class="col"><button id="bHowBack" class="b-gray">とじる</button></div>
+  </div>
+</div>
+
+<!-- なりかわり -->
+<div id="ovPromo" class="overlay">
+  <div class="card">
+    <div class="emoji">✨</div>
+    <h2>へいたいが むこうまで ついたよ！</h2>
+    <p>どの こまに かわる？</p>
+    <div class="col" id="promoCol"></div>
+  </div>
+</div>
+
+<!-- おわり -->
+<div id="ovEnd" class="overlay">
+  <div class="card">
+    <div class="emoji" id="endEmoji">🎉</div>
+    <h2 id="endTitle">やったね！</h2>
+    <p id="endText"></p>
+    <div class="col">
+      <button id="bAgain">もういちど あそぶ</button>
+      <button id="bLook" class="b-green">ばんを みる</button>
+      <button id="bEndMenu" class="b-gray">めにゅーへ</button>
+    </div>
+  </div>
+</div>
+
+<!-- めにゅー -->
+<div id="ovMenu" class="overlay">
+  <div class="card">
+    <h2>🏠 めにゅー</h2>
+    <div class="col">
+      <button id="bMenuBack">つづける</button>
+      <button id="bAutoTurn" class="b-purple">🔄 じどうで まわす: する</button>
+      <button id="bMenuHow" class="b-green">📖 こまの うごきかた</button>
+      <button id="bMenuNew" class="b-blue">🆕 さいしょから</button>
+      <button id="bMenuTop" class="b-gray">はじめの がめんへ</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script src="three.min.js"></script>
+<script src="engine.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

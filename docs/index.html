@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3Dちぇす — こどもと あそべる 3Dの チェス</title>
+<meta name="description" content="ひらがなで あそべる、こども むけの 3D チェス。ブラウザで すぐ あそべて、Android アプリも ダウンロード できます。">
+<meta property="og:title" content="3Dちぇす">
+<meta property="og:description" content="ひらがなで あそべる、こども むけの 3D チェス">
+<meta property="og:image" content="screenshot.png">
+<style>
+  :root {
+    --ink: #3b2f2a; --card: #fffaf0; --muted: #7a6a60;
+    --orange: #ff9f43; --blue: #54a0ff; --green: #1dd1a1; --purple: #a29bfe;
+    --shadow: 0 5px 0 rgba(0,0,0,.16);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--ink); background: linear-gradient(#bfe6ff 0, #e8f7ff 420px, #eaf8df 900px, #d7f2c4 100%);
+    font-family: "Hiragino Maru Gothic ProN", "M PLUS Rounded 1c", "Rounded Mplus 1c", "Noto Sans JP", sans-serif;
+    line-height: 1.7;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+  header { text-align: center; padding: 48px 0 20px; }
+  .logo { font-size: 64px; line-height: 1; }
+  h1 { font-size: clamp(40px, 9vw, 64px); margin: 8px 0 4px; letter-spacing: 2px; }
+  .lead { font-size: clamp(18px, 4vw, 22px); margin: 0 0 26px; }
+  .btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-weight: bold;
+    font-size: 20px; padding: 14px 24px; border-radius: 20px; box-shadow: var(--shadow); background: var(--orange);
+  }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.16); }
+  .btn span { display: flex; flex-direction: column; align-items: flex-start; }
+  .btn small { display: block; font-size: 13px; font-weight: normal; opacity: .9; line-height: 1.2; }
+  .btn.blue { background: var(--blue); }
+  .shots { display: flex; gap: 22px; justify-content: center; align-items: flex-start; margin: 40px 0 10px; flex-wrap: wrap; }
+  .shots img { width: min(300px, 80vw); border-radius: 28px; border: 6px solid #fff; box-shadow: 0 10px 30px rgba(40,70,100,.18); }
+  section { margin: 48px 0; }
+  h2 { font-size: 28px; text-align: center; margin: 0 0 20px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .card { background: var(--card); border-radius: 22px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .card .em { font-size: 34px; }
+  .card b { font-size: 19px; display: block; margin: 4px 0 2px; }
+  .pieces { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  @media (max-width: 700px) { .pieces { grid-template-columns: repeat(3, 1fr); } }
+  .pc { background: var(--card); border-radius: 18px; padding: 12px 14px; box-shadow: var(--shadow); text-align: center; }
+  .pc .s { font-size: 40px; line-height: 1.1; }
+  .pc b { display: block; font-size: 18px; }
+  .pc span { font-size: 14px; color: var(--muted); }
+  .parents { background: #fff; border-radius: 24px; padding: 24px 24px 12px; box-shadow: var(--shadow); font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; }
+  .parents h2 { text-align: left; font-size: 24px; }
+  .parents h3 { font-size: 18px; margin: 20px 0 6px; }
+  .parents ol, .parents ul { padding-left: 1.4em; margin: 6px 0 12px; }
+  .note { font-size: 14px; color: var(--muted); }
+  footer { text-align: center; padding: 30px 0 50px; font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">♞</div>
+    <h1>3Dちぇす</h1>
+    <p class="lead">こどもと いっしょに あそべる、ひらがなの 3D チェス</p>
+    <div class="btns">
+      <a class="btn" href="play/">▶ <span>いますぐ あそぶ<small>ブラウザで そのまま</small></span></a>
+      <a class="btn blue" href="3Dchess.apk" download>📱 <span>アプリを ダウンロード<small>Android（APK）</small></span></a>
+    </div>
+    <div class="shots">
+      <img src="screenshot.png" alt="ゲームの がめん。ひんとの ほしが でている">
+      <img src="screenshot-menu.png" alt="はじめの がめん。ふたりで あそぶ、ろぼっとと あそぶ">
+    </div>
+  </header>
+
+  <section>
+    <h2>できること</h2>
+    <div class="grid">
+      <div class="card"><div class="em">👫</div><b>ふたりで あそぶ</b>おうちの ひとや ともだちと たいせん！</div>
+      <div class="card"><div class="em">🤖</div><b>ろぼっとと あそぶ</b>「やさしい・ふつう・つよい」から えらべるよ。</div>
+      <div class="card"><div class="em">🟢</div><b>うごける ところが ひかる</b>こまを さわると、いける ますが みどりに ひかるよ。</div>
+      <div class="card"><div class="em">💡</div><b>ひんと</b>こまったら ⭐で いい てを おしえてくれるよ。</div>
+      <div class="card"><div class="em">↩️</div><b>まった</b>まちがえても ひとつ もどせるよ。</div>
+      <div class="card"><div class="em">🔄</div><b>ぐるっと まわせる</b>ゆびで なぞると ばんが まわるよ。</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>こまの なまえ</h2>
+    <div class="pieces">
+      <div class="pc"><div class="s">♔</div><b>おうさま</b><span>まわりに 1ます</span></div>
+      <div class="pc"><div class="s">♕</div><b>じょおう</b><span>どこまでも まっすぐ</span></div>
+      <div class="pc"><div class="s">♖</div><b>おしろ</b><span>たて・よこ</span></div>
+      <div class="pc"><div class="s">♗</div><b>ぼうさん</b><span>ななめ</span></div>
+      <div class="pc"><div class="s">♘</div><b>うま</b><span>「L」に ぴょん</span></div>
+      <div class="pc"><div class="s">♙</div><b>へいたい</b><span>まえに 1ます</span></div>
+    </div>
+  </section>
+
+  <section class="parents">
+    <h2>おうちの方へ</h2>
+    <p>正式なチェスのルール（キャスリング・アンパッサン・プロモーション・引き分け判定）に対応した、子ども向けの3Dチェスです。画面の文字はすべてひらがなです。</p>
+
+    <h3>ブラウザで遊ぶ</h3>
+    <p>「いますぐ あそぶ」を押すだけで、スマホ・タブレット・パソコンのブラウザで遊べます。インストールは不要です。</p>
+
+    <h3>Android アプリとして入れる</h3>
+    <ol>
+      <li>「アプリを ダウンロード」から <code>3Dchess.apk</code> をダウンロードします。</li>
+      <li>ダウンロードしたファイルを開きます。</li>
+      <li>「提供元不明のアプリ」の許可を求められたら、ブラウザ（またはファイルアプリ）に許可を出します。</li>
+      <li>「インストール」を押すと、ホーム画面に「3Dちぇす」が追加されます。</li>
+    </ol>
+    <p class="note">対応：Android 8.0 以降。Google Play 以外からのインストールになるため、上の許可が必要です。</p>
+
+    <h3>安心して使えるように</h3>
+    <ul>
+      <li>広告・課金はありません。</li>
+      <li>アプリはインターネット接続の権限を持たず、データを外部に送りません。</li>
+      <li>途中の対局は端末の中にだけ保存されます。</li>
+    </ul>
+
+    <h3>ソースコード</h3>
+    <p><a href="https://github.com/barosa-shinichi/chess3d-kids">github.com/barosa-shinichi/chess3d-kids</a></p>
+  </section>
+
+  <footer>3Dちぇす</footer>
+</div>
+</body>
+</html>
