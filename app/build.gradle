@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'jp.chess3d.kids'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "jp.chess3d.kids"
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    def ks = rootProject.file('chess3d.keystore')
+    signingConfigs {
+        release {
+            storeFile rootProject.file('chess3d.keystore')
+            storePassword 'chess3dkids'
+            keyAlias 'chess3d'
+            keyPassword 'chess3dkids'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (ks.exists()) signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    androidResources {
+        noCompress += ['js', 'html']
+    }
+}

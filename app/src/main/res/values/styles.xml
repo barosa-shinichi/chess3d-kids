@@ -1,0 +1,11 @@
+<resources>
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/sky</item>
+        <item name="android:statusBarColor">@color/sky</item>
+        <item name="android:navigationBarColor">@color/grass</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <color name="sky">#BFE6FF</color>
+    <color name="grass">#9EE07A</color>
+    <color name="icon_bg">#7ED3FF</color>
+</resources>
